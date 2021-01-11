@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
+//A controller that allows the character to move
+//NOTE: in this game the charater movement has to be restricted somewhat
+//As the player will be moving through a grid but the frid won't be seen
+//This is the end for the psuedo-code as this script is unfinished
 public class Move2D : MonoBehaviour
 {
     private static float distance = 7f;
