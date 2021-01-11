@@ -3,7 +3,7 @@ A puzzle game created for the FBLA (Future Buisness Leaders of America) competet
 Aryan and Victor make sure to create your own forks so you guys can work on it independently
 And create a merge request when you want to add something to the main repository
 
-# Members:
+# Members
 * Captain : Aryan Mathur
 * Member : Donedison Tumaini
 * Member : Victor (I don't know his last name)
