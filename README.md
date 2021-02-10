@@ -6,4 +6,4 @@ And create a merge request when you want to add something to the main repository
 # Members
 * Captain : Aryan Mathur
 * Member : Donedison Tumaini
-* Member : Victor (I don't know his last name)
+* Member : Victor Languanes
