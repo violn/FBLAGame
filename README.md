@@ -1,9 +1,8 @@
 # FBLAGame
-A puzzle game created for the FBLA (Future Buisness Leaders of America) competetion
-Aryan and Victor make sure to create your own forks so you guys can work on it independently
-And create a merge request when you want to add something to the main repository
+A puzzle game created for the FBLA (Future Buisness Leaders of America) competetion.
+Mostly everything uploaded here was made by Tumaini Donedison.
 
 # Members
 * Captain : Aryan Mathur
-* Member : Donedison Tumaini
+* Member : Tumaini Donedison
 * Member : Victor Languanes
