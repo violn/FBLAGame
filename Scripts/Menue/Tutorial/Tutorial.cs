@@ -10,11 +10,12 @@ public class Tutorial : MonoBehaviour
     public GameObject goal;
     public TextMeshProUGUI bottomTextFG;
     public TextMeshProUGUI bottomTextBG;
-    private List<GameObject> screens = new List<GameObject>();
+    private readonly List<GameObject> screens = new List<GameObject>();
     private int currentScreen;
 
     private void Start()
     {
+        screens.Clear();
         screens.Add(basicMove);
         screens.Add(depthMove);
         screens.Add(grabbing);
@@ -26,23 +27,13 @@ public class Tutorial : MonoBehaviour
 
     public void GoNext()
     {
-        if (currentScreen == screens.Count)
-        {
-            currentScreen = 1;
-        }
-        else currentScreen++;
-
+        currentScreen = currentScreen == screens.Count ? 1 : currentScreen++;
         DisplayScreen();
     }
 
     public void GoBack()
     {
-        if (currentScreen == 1)
-        {
-            currentScreen = screens.Count;
-        }
-        else currentScreen--;
-
+        currentScreen = currentScreen == screens.Count ? screens.Count : currentScreen--;
         DisplayScreen();
     }
 
@@ -50,17 +41,9 @@ public class Tutorial : MonoBehaviour
     {
         for (int x = 0; x < screens.Count; x++)
         {
-            if (x != currentScreen - 1)
-            {
-                screens[x].SetActive(false);
-            }
-            else
-            {
-                screens[x].SetActive(true);
-            }
+            screens[x].SetActive(!(x != currentScreen - 1));
         }
 
-        bottomTextBG.text = screens[currentScreen - 1].name;
-        bottomTextFG.text = screens[currentScreen - 1].name;
+        bottomTextFG.text = bottomTextBG.text = screens[currentScreen - 1].name;
     }
 }
