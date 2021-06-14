@@ -1,12 +1,11 @@
-﻿//Sets and stores the game time in a level
-
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class Timer : MonoBehaviour
 {
-    public TextMeshProUGUI timerText;
     public TextMeshProUGUI timerTextFG;
+    public TextMeshProUGUI timerTextBG;
     public static int secondsElapsed;
     public static int frames;
     public static int seconds;
@@ -28,7 +27,7 @@ public class Timer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!FinishLevel.inResults && !Fail.inFail && !PauseMenue.paused)
+        if (!FinishLevel.inResults && !Fail.inFail)
         {
             frames++;
 
@@ -45,16 +44,7 @@ public class Timer : MonoBehaviour
                 seconds = 59;
             }
 
-            if (seconds < 10)
-            {
-                timerText.text = minutes + ":0" + seconds;
-                timerTextFG.text = minutes + ":0" + seconds;
-            }
-            else
-            {
-                timerText.text = minutes + ":" + seconds;
-                timerTextFG.text = minutes + ":" + seconds;
-            }
+            timerTextFG.text = timerTextBG.text = seconds < 10 ? $"{minutes}:0{seconds}" : $"{minutes}:{seconds}";
         }
     }
 }
