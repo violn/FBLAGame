@@ -2,31 +2,27 @@ using UnityEngine;
 
 public class Fade : MonoBehaviour
 {
-    public GameObject fo;
-    public static GameObject fade_obj;
+    private static GameObject fade_obj;
     public static Color fade_color;
-    public static float change_time = 0f;
+    private static float change_time;
 
     private void Start()
     {
-        fade_obj = fo;
+        change_time = 0f;
+        fade_obj = gameObject;
         fade_color = fade_obj.GetComponent<Renderer>().material.color;
-        fade_color.a = 0f;
-        fade_obj.GetComponent<Renderer>().material.color = fade_color;
+        fade_obj.GetComponent<Renderer>().material.color -= new Color(0f, 0f, 0f, 1f);
     }
 
     public static void FadeIn()
     {
-        if (fade_color.a != .4f)
+        while (fade_color.a != .4f)
         {
             fade_color.a = Mathf.Lerp(0f, .4f, change_time);
             fade_obj.GetComponent<Renderer>().material.color = fade_color;
             change_time += 1f * Time.deltaTime;
         }
 
-        if (fade_color.a == .4f)
-        {
-            change_time = 0f;
-        }
+        change_time = 0f;
     }
 }
