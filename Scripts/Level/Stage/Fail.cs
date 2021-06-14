@@ -1,4 +1,4 @@
-//Fails the user and removes a life if they restart
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -26,16 +26,13 @@ public class Fail : MonoBehaviour
             }
 
             inFail = true;
-            GlobalRef.globalMethod.SidePanelsMoveIn();
+            GlobalMethods.SidePanelsMoveIn();
             ExpandFail();
         }
-
-        if (inFail)
+        
+        if(inFail && Fade.fade_color.a < .4f)
         {
-            if (Fade.fade_color.a < .4f)
-            {
-                Fade.FadeIn();
-            }
+            Fade.FadeIn();
         }
     }
 
