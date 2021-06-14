@@ -3,7 +3,7 @@ using UnityEngine;
 public class PauseMenue : MonoBehaviour
 {
     public KeyCode pauseKey;
-    public static bool paused;
+    private static bool paused;
 
     private void Start()
     {
@@ -14,47 +14,48 @@ public class PauseMenue : MonoBehaviour
     {
         if (!FinishLevel.inResults && !paused && Input.GetKeyDown(pauseKey))
         {
+            PlayerProps.still = false;
             gameObject.SetActive(true);
             paused = true;
-            GlobalRef.globalMethod.SidePanelsMoveIn();
+            GlobalMethods.SidePanelsMoveIn();
             iTween.MoveTo(gameObject,
                 iTween.Hash(
-                    "position", new Vector3(0f, 0f, 0f) + GlobalRef.globalVariable.localPosition,
+                    "position", new Vector3(0f, 0f, 0f) + GlobalVariables.localPosition,
                     "time", .75f,
                     "easetype", "easeoutback"));
         }
         else if (paused && Input.GetKeyDown(pauseKey))
         {
-            GlobalRef.globalMethod.SidePanelsMoveOut();
+            GlobalMethods.SidePanelsMoveOut();
             iTween.MoveTo(gameObject,
                 iTween.Hash(
-                    "position", new Vector3(-1920f, 0f, 0f) + GlobalRef.globalVariable.localPosition,
+                    "position", new Vector3(-1920f, 0f, 0f) + GlobalVariables.localPosition,
                     "time", .75f,
                     "easetype", "easeoutback",
                     "oncompletetarget", gameObject,
                     "oncomplete", "Unpaused"));
         }
 
-        if (FinishLevel.inResults && gameObject.transform.position == new Vector3(0f, 0f, 0f) + GlobalRef.globalVariable.localPosition)
+        if (FinishLevel.inResults && gameObject.transform.position == new Vector3(0f, 0f, 0f) + GlobalVariables.localPosition)
         {
             gameObject.SetActive(false);
             paused = false;
-            gameObject.transform.position = new Vector3(1920f, 0f, 0f) + GlobalRef.globalVariable.localPosition;
+            gameObject.transform.position = new Vector3(1920f, 0f, 0f) + GlobalVariables.localPosition;
         }
     }
 
     public void Unpaused()
     {
         paused = false;
-        gameObject.transform.position = new Vector3(1920f, 0f, 0f) + GlobalRef.globalVariable.localPosition;
+        gameObject.transform.position = new Vector3(1920f, 0f, 0f) + GlobalVariables.localPosition;
     }
 
     public void Resume()
     {
-        GlobalRef.globalMethod.SidePanelsMoveOut();
+        GlobalMethods.SidePanelsMoveOut();
         iTween.MoveTo(gameObject,
             iTween.Hash(
-                "position", new Vector3(-1920f, 0f, 0f) + GlobalRef.globalVariable.localPosition,
+                "position", new Vector3(-1920f, 0f, 0f) + GlobalVariables.localPosition,
                 "time", .75f,
                 "easetype", "easeoutback",
                 "oncompletetarget", gameObject,
