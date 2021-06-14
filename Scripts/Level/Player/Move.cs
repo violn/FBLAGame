@@ -1,185 +1,95 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 
 public class Move : MonoBehaviour
 {
-    public static float MoveTime = .3f;
+    public const float moveTime = .25f;
 
     private void Update()
     {
-        float xDirection = Input.GetAxisRaw("Horizontal");
-        float yDirection = Input.GetAxisRaw("Vertical");
+        float xInput = Input.GetAxisRaw("Horizontal");
+        float yInput = Input.GetAxisRaw("Vertical");
+        Vector3 player_position = gameObject.transform.position;
 
-        if (GlobalRefLevel.playerProperties.finishedScalingDown &&
-            GlobalRefLevel.playerProperties.finishedScalingUp &&
-            !GlobalRefLevel.playerProperties.moving &&
-            !GlobalRefLevel.playerProperties.grabState &&
-            !FinishLevel.inResults &&
-            StartLevel.levelStarted &&
-            !PauseMenue.paused
-            && !Grab.squishing)
+        if (PlayerProps.still && !Grab.grabbing && (Math.Abs(xInput) > 0 || Math.Abs(yInput) > 0))
         {
-            if (Mathf.Abs(xDirection) == 1f)
+            if (Math.Abs(xInput) == 1f)
             {
-                if (GlobalRefLevel.playerProperties.depth == 0)
+                if (!CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xInput, 0f)) &&
+                    CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xInput, -1f)))
                 {
-                    if (CheckCollision(gameObject, GlobalRef.globalLayer.ground, 0f, -1f))
-                    {
-                        if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f))
-                        {
-                            MoveObj(MoveTime, xDirection, 0f);
-                        }
-                        else if (CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 1f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 1f))
-                        {
-                            MoveObj(MoveTime, xDirection, 1f);
-                        }
-                    }
-                    else
-                    {
-                        if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f) &&
-                            CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, -1f))
-                        {
-                            MoveObj(MoveTime, xDirection, 0f);
-                        }
-                        else if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, -1f) &&
-                            CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, -2f))
-                        {
-                            MoveObj(MoveTime, xDirection, -1f);
-                        }
-                        else if (CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 1f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 2f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 1f))
-                        {
-                            MoveObj(MoveTime, xDirection, 1f);
-                        }
-                    }
+                    MoveObj(player_position + new Vector3(xInput, 0f));
                 }
-                else
+                else if (CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xInput, 0f)) &&
+                    !CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(0f, 1f)) &&
+                    !CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xInput, 1f)))
                 {
-                    if (CheckCollision(gameObject, GlobalRef.globalLayer.ground, 0f, -1f))
-                    {
-                        if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f))
-                        {
-                            MoveObj(MoveTime, xDirection, 0f);
-                        }
-                        else if (CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 1f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 1f))
-                        {
-                            MoveObj(MoveTime, xDirection, 1f);
-                        }
-                    }
-                    else
-                    {
-                        if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f) &&
-                            CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, -1f))
-                        {
-                            MoveObj(MoveTime, xDirection, 0f);
-                        }
-                        else if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, -1f) &&
-                            CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, -2f))
-                        {
-                            MoveObj(MoveTime, xDirection, -1f);
-                        }
-                        else if (CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 1f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 2f) &&
-                            !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 1f))
-                        {
-                            MoveObj(MoveTime, xDirection, 1f);
-                        }
-                    }
+                    MoveObj(player_position + new Vector3(xInput, 1f));
+                }
+                else if (!CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xInput, 0f)) &&
+                    CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xInput, -2f)))
+                {
+                    MoveObj(player_position + new Vector3(xInput, -1f));
                 }
             }
-            else if (yDirection == -1f && GlobalRefLevel.playerProperties.depth == 1)
+            else if ((yInput == 1f && PlayerProps.currentDepth != 1) || (yInput == -1f && PlayerProps.currentDepth != 0))
             {
-                if (CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 0f) &&
-                    !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 1f) &&
-                    !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 1f))
+                if (
+                    !CheckCollision(PlayerProps.depth[PlayerProps.GetOppositeDepth()], player_position) &&
+                    CheckCollision(PlayerProps.depth[PlayerProps.GetOppositeDepth()], player_position + new Vector3(0f, -1f)))
                 {
-                    MoveObj(MoveTime, 0f, -yDirection);
-                    GlobalRefLevel.playerProperties.depth = 0;
+                    MoveObj(player_position + new Vector3(0f, yInput * -.1875f));
+                    PlayerProps.ChangeScale();
                 }
-                else if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 0f) &&
-                    CheckGround(gameObject, GlobalRef.globalLayer.depth0, 0f))
+                else if (
+                    CheckCollision(PlayerProps.depth[PlayerProps.GetOppositeDepth()], player_position) &&
+                    !CheckCollision(PlayerProps.depth[PlayerProps.GetOppositeDepth()], player_position + new Vector3(0f, 1f)) &&
+                    !CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(0f, 1f)))
                 {
-                    GlobalRefLevel.playerProperties.depth = 0;
+                    MoveObj(player_position + new Vector3(0f, 1f + yInput * -.1875f));
+                    PlayerProps.ChangeScale();
                 }
-                else if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 0f) &&
-                    !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, -1f) &&
-                    CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, -2f))
+                else if (
+                    !CheckCollision(PlayerProps.depth[PlayerProps.GetOppositeDepth()], player_position) &&
+                    CheckCollision(PlayerProps.depth[PlayerProps.GetOppositeDepth()], player_position + new Vector3(0f, -2f)))
                 {
-                    MoveObj(MoveTime, 0f, yDirection);
-                    GlobalRefLevel.playerProperties.depth = 0;
-                }
-            }
-            else if (yDirection == 1f && GlobalRefLevel.playerProperties.depth == 0)
-            {
-                if (CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 0f) &&
-                    !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 1f) &&
-                    !CheckCollision(gameObject, GlobalRef.globalLayer.depth0, 0f, 1f))
-                {
-                    MoveObj(MoveTime, 0f, yDirection);
-                    GlobalRefLevel.playerProperties.depth = 1;
-                }
-                else if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 0f) &&
-                    CheckGround(gameObject, GlobalRef.globalLayer.depth1, 0f))
-                {
-                    GlobalRefLevel.playerProperties.depth = 1;
-                }
-                else if (!CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, 0f) &&
-                    !CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, -1f) &&
-                    CheckCollision(gameObject, GlobalRef.globalLayer.depth1, 0f, -2f))
-                {
-                    MoveObj(MoveTime, 0f, -yDirection);
-                    GlobalRefLevel.playerProperties.depth = 1;
+                    MoveObj(player_position + new Vector3(0f, -1f + yInput * -.1875f));
+                    PlayerProps.ChangeScale();
                 }
             }
         }
     }
 
+    /// <summary>
+    /// Moves an object to a given position.
+    /// </summary>
+    /// <param name="obj">The object being moved. Defaults to player</param>
+    /// <param name="time">The time it should take to move. Defaults to moveTime</param>
+    /// <param name="position">The position the object should go to.</param>
+    public static void MoveObj(Vector3 position, GameObject obj = null, float time = moveTime)
+    {
+        obj = obj != null ? obj : PlayerProps.player;
+
+        PlayerProps.still = false;
+        iTween.MoveTo(obj,
+            iTween.Hash(
+                "position", position,
+                "easeType", "linear",
+                "time", time,
+                "oncompletetarget", PlayerProps.player,
+                "oncomplete", "DoneMoving"));
+    }
+
+    /// <summary>
+    /// Checks if an object is over a collider.
+    /// </summary>
+    /// <param name="layer">The layer the collider is on.</param>
+    /// <param name="position">The position to check.</param>
+    /// <returns>Returns true if the object is over a collider.</returns>
+    public static bool CheckCollision(LayerMask layer, Vector3 position) => Physics2D.OverlapCircle(position, .001f, layer);
+
     public void DoneMoving()
     {
-        GlobalRefLevel.playerProperties.moving = false;
-    }
-
-    public void MoveObj(float time, float x, float y)
-    {
-        GlobalRefLevel.playerProperties.moving = true;
-        iTween.MoveBy(gameObject,
-            iTween.Hash(
-                "x", x,
-                "y", y,
-                "easeType", "linear",
-                "time", time,
-                "oncompletetarget", gameObject,
-                "oncomplete", "DoneMoving"));
-    }
-
-    public void MoveObj(GameObject obj, float time, float x, float y)
-    {
-        GlobalRefLevel.playerProperties.moving = true;
-        iTween.MoveBy(obj,
-            iTween.Hash(
-                "x", x,
-                "y", y,
-                "easeType", "linear",
-                "time", time,
-                "oncompletetarget", gameObject,
-                "oncomplete", "DoneMoving"));
-    }
-
-    public bool CheckCollision(GameObject obj, LayerMask layer, float x, float y)
-    {
-        return Physics2D.OverlapCircle(obj.transform.position + new Vector3(x, y), .001f, layer);
-    }
-
-    public bool CheckGround(GameObject plr, LayerMask layer, float x)
-    {
-        return CheckCollision(plr, layer, x, -1f) || CheckCollision(plr, GlobalRef.globalLayer.ground, x, -1f);
+        PlayerProps.still = true;
     }
 }
