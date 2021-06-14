@@ -1,210 +1,93 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class Grab : MonoBehaviour
 {
-    public KeyCode grabKey;
-    private GameObject blockHeld;
-    public static bool squishing;
+    private enum HoldingDirection
+    {
+        left = -1,
+        right = 1,
+        neutral = 0
+    }
 
-    /// <summary>
-    /// 0 is none, 1 is left, 2 is right
-    /// </summary>
-    private static int HoldingDirection = 0;
+    private static HoldingDirection currentDirection = HoldingDirection.neutral;
+    public KeyCode grabKey;
+    public KeyCode shoveKey;
+    private static GameObject blockHeld;
+    private static bool holdingSomething;
+    public static bool grabbing;
+    private const float grabMove = .3125f;
 
     private void Start()
     {
-        squishing = false;
+        grabbing = false;
+        holdingSomething = false;
     }
 
     private void Update()
     {
         float xDirection = Input.GetAxisRaw("Horizontal");
+        Vector3 player_position = PlayerProps.player.transform.position;
 
-        if (GlobalRefLevel.playerProperties.finishedScalingUp &&
-            GlobalRefLevel.playerProperties.finishedScalingDown &&
-            !GlobalRefLevel.playerProperties.moving &&
-            !FinishLevel.inResults &&
-            StartLevel.levelStarted &&
-            !PauseMenue.paused
-            && !squishing)
+        if (PlayerProps.still)
         {
             if (Input.GetKeyDown(grabKey))
             {
-                if (!GlobalRefLevel.playerProperties.grabState)
+                if (!grabbing)
                 {
-                    Squish(gameObject, Move.MoveTime);
-                    GlobalRefLevel.playerProperties.grabState = true;
+                    Squish();
                 }
-                else
-                {
-                    if (GlobalRefLevel.playerProperties.depth == 1)
-                    {
-                        UnSquish(gameObject, Move.MoveTime);
-                        if (GlobalRefLevel.playerProperties.holdingSomething)
-                        {
-                            if (HoldingDirection == 1)
-                            {
-                                GlobalRefLevel.objectMove.MoveObj(Move.MoveTime, -(1 - GlobalRefLevel.playerProperties.grabMove + .09375f), 0f);
-                            }
-                            else if (HoldingDirection == 2)
-                            {
-                                GlobalRefLevel.objectMove.MoveObj(Move.MoveTime, (1 - GlobalRefLevel.playerProperties.grabMove + .09375f), 0f);
-                            }
-
-                            HoldingDirection = 0;
-                            GlobalRefLevel.playerProperties.holdingSomething = false;
-                        }
-                    }
-                    else
-                    {
-                        UnSquish(gameObject, Move.MoveTime);
-                        if (GlobalRefLevel.playerProperties.holdingSomething)
-                        {
-                            if (HoldingDirection == 1)
-                            {
-                                GlobalRefLevel.objectMove.MoveObj(Move.MoveTime, -(1 - GlobalRefLevel.playerProperties.grabMove), 0f);
-                            }
-                            else if (HoldingDirection == 2)
-                            {
-                                GlobalRefLevel.objectMove.MoveObj(Move.MoveTime, (1 - GlobalRefLevel.playerProperties.grabMove), 0f);
-                            }
-
-                            HoldingDirection = 0;
-                            GlobalRefLevel.playerProperties.holdingSomething = false;
-                        }
-                    }
-
-                    GlobalRefLevel.playerProperties.grabState = false;
-                }
+                else UnSquish();
             }
-            else if (Mathf.Abs(xDirection) == 1f)
+
+            if (grabbing)
             {
-                if (GlobalRefLevel.playerProperties.holdingSomething)
+                if (Mathf.Abs(xDirection) > 0f)
                 {
-                    if (HoldingDirection == 1)
+                    if (holdingSomething)
                     {
-                        if (GlobalRefLevel.playerProperties.depth == 0)
+                        if (Move.CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xDirection, -1f)) &&
+                            !Move.CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xDirection == (float)currentDirection ? xDirection * 2f : xDirection, 0f)))
                         {
-                            if (xDirection == 1f)
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth0, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection + 1f, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                            else
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth0, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (xDirection == 1f)
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth1, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection + 1f, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                            else
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth1, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
+                            Move.MoveObj(player_position + new Vector3(xDirection, 0f));
+                            Move.MoveObj(blockHeld.transform.position + new Vector3(xDirection, 0f), blockHeld);
                         }
                     }
-                    else if (HoldingDirection == 2)
+                    else if (Move.CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], player_position + new Vector3(xDirection, 0f)))
                     {
-                        if (GlobalRefLevel.playerProperties.depth == 0)
-                        {
-                            if (xDirection == -1f)
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth0, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection - 1f, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                            else
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth0, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (xDirection == -1f)
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth1, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection - 1f, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                            else
-                            {
-                                if (GlobalRefLevel.objectMove.CheckGround(gameObject, GlobalRef.globalLayer.depth1, xDirection) &&
-                                    !GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f))
-                                {
-                                    GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection, 0f);
-                                    GlobalRefLevel.objectMove.MoveObj(blockHeld, Move.MoveTime, xDirection, 0f);
-                                }
-                            }
-                        }
+                        blockHeld = Hold(PlayerProps.depth[PlayerProps.currentDepth], xDirection, 0f);
+                        Move.MoveObj(player_position + new Vector3(xDirection * grabMove + (PlayerProps.currentDepth == 0 ? 0f : xDirection * .09375f), 0f));
+                        currentDirection = xDirection == 1f ? HoldingDirection.right : HoldingDirection.left;
                     }
                 }
-                else if (GlobalRefLevel.playerProperties.grabState)
+                else if (holdingSomething)
                 {
-                    if (GlobalRefLevel.playerProperties.depth == 0)
+                    if (Input.GetKeyDown(shoveKey))
                     {
-                        if (GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f))
+                        Vector3 collison_detector1 = blockHeld.transform.position + new Vector3((float)currentDirection, 0f);
+                        Vector3 collison_detector2 = blockHeld.transform.position + new Vector3((float)currentDirection, -1f);
+
+                        while (true)
                         {
-                            blockHeld = Hold(gameObject, GlobalRef.globalLayer.depth0, xDirection, 0f);
-                            if (xDirection == 1f)
+                            if (!Move.CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], collison_detector1))
                             {
-                                GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection - GlobalRefLevel.playerProperties.grabMove, 0f);
-                                HoldingDirection = 1;
+                                collison_detector1 += new Vector3((float)currentDirection, 0f);
                             }
-                            else if (xDirection == -1f)
+                            else
                             {
-                                GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection + GlobalRefLevel.playerProperties.grabMove, 0f);
-                                HoldingDirection = 2;
+                                Move.MoveObj(new Vector3(collison_detector1.x - 1f, blockHeld.transform.position.y), blockHeld, .25f * (collison_detector1.x - blockHeld.transform.position.x));
+                                UnSquish();
+                                break;
                             }
-                        }
-                    }
-                    else if (GlobalRefLevel.playerProperties.depth == 1)
-                    {
-                        if (GlobalRefLevel.objectMove.CheckCollision(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f))
-                        {
-                            blockHeld = Hold(gameObject, GlobalRef.globalLayer.depth1, xDirection, 0f);
-                            if (xDirection == 1f)
+
+                            if (Move.CheckCollision(PlayerProps.depth[PlayerProps.currentDepth], collison_detector2))
                             {
-                                GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection - GlobalRefLevel.playerProperties.grabMove + .09375f, 0f);
-                                HoldingDirection = 1;
+                                collison_detector2 += new Vector3((float)currentDirection, 0f);
                             }
-                            else if (xDirection == -1f)
+                            else
                             {
-                                GlobalRefLevel.objectMove.MoveObj(gameObject, Move.MoveTime, xDirection + GlobalRefLevel.playerProperties.grabMove - .09375f, 0f);
-                                HoldingDirection = 2;
+                                Move.MoveObj(new Vector3(collison_detector2.x - 1f, blockHeld.transform.position.y), blockHeld, .25f * (collison_detector2.x - blockHeld.transform.position.x));
+                                UnSquish();
+                                break;
                             }
                         }
                     }
@@ -213,67 +96,56 @@ public class Grab : MonoBehaviour
         }
     }
 
-    private void Squish(GameObject plr, float time)
+    private void Squish()
     {
-        squishing = true;
+        PlayerProps.still = false;
 
-        if (GlobalRefLevel.playerProperties.depth == 1)
+        iTween.ScaleTo(gameObject,
+            iTween.Hash(
+                "scale", PlayerProps.currentDepth == 1 ? new Vector3(.1875f, .375f, 0f) : new Vector3(.375f, .75f, 0f),
+                "time", Move.moveTime,
+                "oncompletetarget", gameObject,
+                "oncomplete", "DoneSquishing"
+                ));
+
+        grabbing = true;
+    }
+
+    private void UnSquish()
+    {
+        PlayerProps.still = false;
+
+        iTween.ScaleTo(gameObject,
+            iTween.Hash(
+                "scale", PlayerProps.currentDepth == 1 ? new Vector3(.375f, .375f, 0f) : new Vector3(.75f, .75f, 0f),
+                "time", Move.moveTime,
+                "oncompletetarget", gameObject,
+                "oncomplete", "DoneSquishing"
+                ));
+
+        Detatch();
+        grabbing = false;
+    }
+
+    private static void Detatch()
+    {
+        if (holdingSomething)
         {
-            iTween.ScaleTo(plr,
-                iTween.Hash(
-                    "scale", new Vector3(.1875f, .375f, 0f),
-                    "time", time,
-                    "oncompletetarget", gameObject,
-                    "oncomplete", "DoneSquishing"
-                    ));
-        }
-        else
-        {
-            iTween.ScaleTo(plr,
-              iTween.Hash(
-                  "scale", new Vector3(.375f, .75f, 0f),
-                  "time", time,
-                  "oncompletetarget", gameObject,
-                  "oncomplete", "DoneSquishing"
-                  ));
+            Move.MoveObj(PlayerProps.player.transform.position + new Vector3(-(float)currentDirection * (grabMove + (PlayerProps.currentDepth == 1 ? .09375f : 0f)), 0f));
+            currentDirection = HoldingDirection.neutral;
+            holdingSomething = false;
         }
     }
 
-    private void UnSquish(GameObject plr, float time)
+    private GameObject Hold(LayerMask Depth, float x, float y)
     {
-        squishing = true;
-
-        if (GlobalRefLevel.playerProperties.depth == 1)
-        {
-            iTween.ScaleTo(plr,
-                iTween.Hash(
-                    "scale", new Vector3(.375f, .375f, 0f),
-                    "time", time,
-                    "oncompletetarget", gameObject,
-                    "oncomplete", "DoneSquishing"
-                    ));
-        }
-        else
-        {
-            iTween.ScaleTo(plr,
-                iTween.Hash(
-                    "scale", new Vector3(.75f, .75f, 0f),
-                    "time", time,
-                    "oncompletetarget", gameObject,
-                    "oncomplete", "DoneSquishing"
-                    ));
-        }
-    }
-
-    private GameObject Hold(GameObject plr, LayerMask Depth, float x, float y)
-    {
-        GlobalRefLevel.playerProperties.holdingSomething = true;
-        Collider2D BlockCollider = Physics2D.OverlapCircle(plr.transform.position + new Vector3(x, y + .5f, 0f), .001f, Depth);
+        holdingSomething = true;
+        Collider2D BlockCollider = Physics2D.OverlapCircle(gameObject.transform.position + new Vector3(x, y + .5f, 0f), .001f, Depth);
         return BlockCollider.gameObject;
     }
 
     private void DoneSquishing()
     {
-        squishing = false;
+        PlayerProps.still = true;
     }
 }
