@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,12 +14,12 @@ public class LogoAnimations : MonoBehaviour
     public static bool fadingOut = false;
     private readonly List<string> text = new List<string>()
     {
-        "The world said hello back.",
+        "Hello World! And the world said hello back.",
         "This is a world premier.",
         "It's spelled misspelled.",
         "Protect black women.",
         "Support black businesses.",
-        "2 + 2 is 22.",
+        "The world would be so much better if 2 + 2 is 22.",
         "The what are the odds of this being the first message you see.",
         "Martin > Fresh Prince.",
         "Isley Brothers are undefeated.",
@@ -27,19 +27,20 @@ public class LogoAnimations : MonoBehaviour
         "Yuugh! - Pusha T.",
         "Shoutout to Mr. Alexander.",
         "Chet Hanks gotta sit down.",
-        "According to all laws of Aviation, a bee should not be able to fly...",
+        "According to all laws of aviation, a bee should not be able to fly.",
         "2 tips on how to be successful. Tip #1 never say everything you know.",
         "The average number of eyes per person is less than 2.",
-        "Something Witty",
-        "If a horse could talk it would only say \"Hey\"",
+        "Something witty.",
+        "If a horse could talk it would only say \"Hey\".",
         "Do you ever wonder why we're here?",
-        "42",
+        "42.",
+        "Nothing ryhmes with nothing.",
+        "It was always me vs the world. Until I found it's me vs me."
     };
 
     private void Start()
     {
-        Random ran = new Random();
-        bottomText.GetComponent<TextMeshProUGUI>().text = text[ran.Next(text.Count)];
+        bottomText.GetComponent<TextMeshProUGUI>().text = text[new Random().Next(text.Count)];
         logoImg = logo.GetComponent<RawImage>();
         logoImg.color = new Color(logoImg.color.r, logoImg.color.g, logoImg.color.b, 0f);
         Move();
