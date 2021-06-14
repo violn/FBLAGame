@@ -1,23 +1,16 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Random = System.Random;
 
 public class SetStageColor : MonoBehaviour
 {
     private static Color32 foregroundColor = new Color32();
-    private static readonly Random ran = new Random();
 
     public void Start()
     {
-        int colorsToChange;
-        int whichColor;
-
-        colorsToChange = ran.Next(2);
-        whichColor = ran.Next(3);
-
-        switch (colorsToChange)
+        switch (new Random().Next(2))
         {
             case 0:
-                switch (whichColor)
+                switch (new Random().Next(3))
                 {
                     case 0:
                         foregroundColor = new Color32(179, 77, 77, 175);
@@ -34,7 +27,7 @@ public class SetStageColor : MonoBehaviour
                 break;
 
             case 1:
-                switch (whichColor)
+                switch (new Random().Next(3))
                 {
                     case 0:
                         foregroundColor = new Color32(179, 179, 77, 175);
@@ -45,7 +38,7 @@ public class SetStageColor : MonoBehaviour
                         break;
 
                     case 2:
-                        foregroundColor = new Color32(179, 77, 177, 175);
+                        foregroundColor = new Color32(179, 77, 179, 175);
                         break;
                 }
                 break;
