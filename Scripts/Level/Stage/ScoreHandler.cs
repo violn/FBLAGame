@@ -7,6 +7,7 @@ using UnityEngine;
 public class ScoreHandler : MonoBehaviour
 {
     public static Dictionary<string, int> scoreKeeper = new Dictionary<string, int>();
+    public static Dictionary<int, int> recordsKeeper = new Dictionary<int, int>();
 
     public static void Save()
     {
@@ -14,7 +15,8 @@ public class ScoreHandler : MonoBehaviour
         FileStream file = File.OpenWrite(Application.persistentDataPath + "/playerInfo.dat");
         ScoreData data = new ScoreData
         {
-            savedScores = scoreKeeper
+            savedScores = scoreKeeper,
+            highScores = recordsKeeper
         };
 
         bf.Serialize(file, data);
@@ -31,6 +33,7 @@ public class ScoreHandler : MonoBehaviour
             file.Close();
 
             scoreKeeper = data.savedScores;
+            recordsKeeper = data.highScores;
         }
     }
 }
@@ -39,4 +42,5 @@ public class ScoreHandler : MonoBehaviour
 internal class ScoreData
 {
     public Dictionary<string, int> savedScores;
+    public Dictionary<int, int> highScores;
 }
