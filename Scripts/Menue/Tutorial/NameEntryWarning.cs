@@ -21,6 +21,6 @@ public class NameEntryWarning : MonoBehaviour
             TextColor.b = Mathf.Lerp(TextColor.b, 1f, ChangeTime);
             ChangeTime += Time.deltaTime * .5f;
         }
-        else ChangeTime = 0;
+        else ChangeTime = 0f;
     }
 }
