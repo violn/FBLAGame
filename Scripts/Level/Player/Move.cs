@@ -59,13 +59,7 @@ public class Move : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// Moves an object to a given position.
-    /// </summary>
-    /// <param name="obj">The object being moved. Defaults to player</param>
-    /// <param name="time">The time it should take to move. Defaults to moveTime</param>
-    /// <param name="position">The position the object should go to.</param>
+    
     public static void MoveObj(Vector3 position, GameObject obj = null, float time = moveTime)
     {
         obj = obj != null ? obj : PlayerProps.player;
@@ -79,13 +73,7 @@ public class Move : MonoBehaviour
                 "oncompletetarget", PlayerProps.player,
                 "oncomplete", "DoneMoving"));
     }
-
-    /// <summary>
-    /// Checks if an object is over a collider.
-    /// </summary>
-    /// <param name="layer">The layer the collider is on.</param>
-    /// <param name="position">The position to check.</param>
-    /// <returns>Returns true if the object is over a collider.</returns>
+    
     public static bool CheckCollision(LayerMask layer, Vector3 position) => Physics2D.OverlapCircle(position, .001f, layer);
 
     public void DoneMoving()
