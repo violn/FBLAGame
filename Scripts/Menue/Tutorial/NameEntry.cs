@@ -12,7 +12,7 @@ public class NameEntry : MonoBehaviour
 
     private void Update()
     {
-        nameEntry.placeholder.GetComponent<Text>().text = nameEntry.isFocused ? "" : nameEntry.placeholder.GetComponent<Text>().text = "Enter your name...";
+        nameEntry.placeholder.GetComponent<Text>().text = nameEntry.isFocused ? "" : "Enter your name...";
     }
 
     public void SetPlayerName()
